@@ -6,8 +6,8 @@ A Claude Code skill that implements Anthropic's [advisor strategy](https://claud
 
 Pairs your current executor model with a more capable advisor model:
 
-- **Sonnet/Haiku** agents consult **Opus**
-- **Opus** agents consult **Codex**
+- **Sonnet/Haiku** agents consult **Fable**
+- **Opus/Fable** agents consult **Codex**
 
 The advisor provides analysis, recommendations, and concrete next steps without implementing anything. Your executor session gets expert guidance at a fraction of the cost of running the advisor end-to-end.
 
@@ -29,7 +29,7 @@ cp SKILL.md ~/.claude/skills/poormansadvisor/
 Manual invocation:
 ```
 /poormansadvisor "should I restructure this schema?"
-/poormansadvisor --opus "best approach for this refactor?"
+/poormansadvisor --fable "best approach for this refactor?"
 /poormansadvisor --codex "is this migration safe?"
 ```
 
@@ -37,7 +37,7 @@ Auto-trigger: the skill is designed to fire automatically when an agent detects 
 
 ## Auto-routing
 
-When no `--opus` or `--codex` flag is given, the skill routes based on the current model — always consulting *up* to a more capable model.
+When no `--fable` or `--codex` flag is given, the skill routes based on the current model — always consulting *up* to a more capable model.
 
 ## License
 

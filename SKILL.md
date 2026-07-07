@@ -1,6 +1,6 @@
 ---
 name: poormansadvisor
-description: "Use when stuck after 2+ failed attempts, facing architectural decisions, debugging loops, cross-repo changes, or needing a second opinion. Auto-routes: Sonnet consults Opus, Opus consults Codex. Invoke manually or let it trigger automatically when things get hard."
+description: "Use when stuck after 2+ failed attempts, facing architectural decisions, debugging loops, cross-repo changes, or needing a second opinion. Auto-routes: Sonnet consults Fable, Fable consults Codex. Invoke manually or let it trigger automatically when things get hard."
 ---
 
 # Poor Man's Advisor
@@ -12,7 +12,7 @@ Consult a more capable model as an advisor for complex decisions. Inspired by An
 ```
 /poormansadvisor "should I restructure this schema?"
 /poormansadvisor --codex "is this migration safe?"
-/poormansadvisor --opus "best approach for this refactor?"
+/poormansadvisor --fable "best approach for this refactor?"
 ```
 
 Or invoked automatically when the skill triggers (see Auto-Trigger below).
@@ -21,7 +21,7 @@ Or invoked automatically when the skill triggers (see Auto-Trigger below).
 
 1. Check `$ARGUMENTS` for flags:
    - `--codex` → force Codex backend
-   - `--opus` → force Opus backend
+   - `--fable` → force Fable backend
    - No flag → auto-route based on current model (see below)
 2. Everything after the flag is the *question*
 
@@ -29,17 +29,18 @@ If no question is provided, ask the user what they want advice on.
 
 ## Auto-Routing
 
-When no explicit `--opus` or `--codex` flag is given, route based on the *current* model:
+When no explicit `--fable` or `--codex` flag is given, route based on the *current* model:
 
 | You are running as | Advisor becomes |
 |---|---|
-| Sonnet (any variant) | Opus |
-| Haiku | Opus |
+| Sonnet (any variant) | Fable |
+| Haiku | Fable |
 | Opus | Codex |
+| Fable | Codex |
 
 This ensures you always consult *up* — a more capable or differently-capable model.
 
-To determine your current model: check the system prompt for "You are powered by the model named..." or the model ID field. If you cannot determine your model, default to Opus.
+To determine your current model: check the system prompt for "You are powered by the model named..." or the model ID field. If you cannot determine your model, default to Fable.
 
 ## Auto-Trigger
 
@@ -61,16 +62,16 @@ digraph advisor {
     "Detect model" [shape=box];
     "Gather context" [shape=box];
     "Which backend?" [shape=diamond];
-    "Spawn Opus agent" [shape=box];
+    "Spawn Fable agent" [shape=box];
     "Spawn Codex agent" [shape=box];
     "Return guidance verbatim" [shape=doublecircle];
 
     "Parse args" -> "Detect model";
     "Detect model" -> "Gather context";
     "Gather context" -> "Which backend?";
-    "Which backend?" -> "Spawn Opus agent" [label="sonnet/haiku or --opus"];
-    "Which backend?" -> "Spawn Codex agent" [label="opus or --codex"];
-    "Spawn Opus agent" -> "Return guidance verbatim";
+    "Which backend?" -> "Spawn Fable agent" [label="sonnet/haiku or --fable"];
+    "Which backend?" -> "Spawn Codex agent" [label="opus/fable or --codex"];
+    "Spawn Fable agent" -> "Return guidance verbatim";
     "Spawn Codex agent" -> "Return guidance verbatim";
 }
 ```
@@ -105,14 +106,14 @@ What I tried: <if auto-triggered, describe failed approaches>
 <user's question or auto-triggered question>
 ```
 
-### Step 2a: Opus Backend
+### Step 2a: Fable Backend
 
 Use the `Agent` tool:
 
 ```yaml
 Agent:
-  description: "Opus advisor consultation"
-  model: "opus"
+  description: "Fable advisor consultation"
+  model: "fable"
   prompt: |
     You are an advisor. Your job is to provide thorough, expert guidance.
     You will NOT implement anything. You provide analysis, recommendations,
@@ -167,12 +168,12 @@ Return the advisor's response *verbatim*. Do not:
 
 After the verbatim response, add one line:
 
-> *Advisor: {opus|codex} (auto-routed from {your model}) | To act on this guidance, proceed normally.*
+> *Advisor: {fable|codex} (auto-routed from {your model}) | To act on this guidance, proceed normally.*
 
 ## Rules
 
 - The advisor *advises*. It does not implement.
-- Max effort always: Opus gets full thinking depth. Codex gets `--effort xhigh`.
+- Max effort always: Fable gets full thinking depth. Codex gets `--effort xhigh`.
 - Context first: always gather and pass the context bundle. Don't make the advisor waste tokens orienting itself.
 - Verbatim return: the executor sees exactly what the advisor said.
 - One consultation per invocation. For follow-up, invoke again.
